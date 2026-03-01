@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>More Than A Sister</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;600&family=Playfair+Display:italic,wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #ffcf40;
+            --accent: #00e5ff;
+            --map-road: #2c2c2e;
+        }
+
+        /* STICKY SNAP SCROLLING */
+        html { scroll-behavior: smooth; }
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #020205; color: white;
+            cursor: none; overflow-x: hidden;
+            scroll-snap-type: y mandatory;
+        }
+
+        section {
+            height: 100vh;
+            width: 100vw;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* --- SECTION 1: YOUR ORIGINAL CODE (UNTOUCHED LOGIC) --- */
+        #custom-cursor {
+            position: fixed; width: 20px; height: 20px;
+            background: var(--accent); border-radius: 50%;
+            pointer-events: none; z-index: 9999;
+            box-shadow: 0 0 20px var(--accent), 0 0 40px var(--accent);
+            transform: translate(-50%, -50%);
+            transition: transform 0.1s ease-out;
+        }
+
+        #intro-curtain {
+            position: fixed; inset: 0; z-index: 5000;
+            background: #000; display: flex;
+            justify-content: center; align-items: center;
+            transition: transform 1.2s cubic-bezier(1, 0, 0, 1);
+        }
+
+        .enter-btn {
+            padding: 20px 40px; border: 1px solid var(--gold);
+            background: none; color: var(--gold);
+            letter-spacing: 5px; cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            transition: 0.4s;
+        }
+
+        .header-story {
+            position: absolute; top: 10%; width: 100%; text-align: center;
+            z-index: 100; pointer-events: none;
+        }
+
+        .story-line {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem; display: block;
+            opacity: 0; filter: blur(10px);
+            animation: revealText 1.5s forwards;
+            letter-spacing: 2px;
+        }
+
+        .story-line-2 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem; color: var(--gold);
+            letter-spacing: 10px; margin-top: 15px;
+            opacity: 0; animation: revealText 1.5s forwards 0.8s;
+        }
+
+        @keyframes revealText {
+            to { opacity: 1; filter: blur(0); transform: translateY(-10px); }
+        }
+
+        .writer-container {
+            position: absolute; inset: 0;
+            display: flex; justify-content: center; align-items: flex-end;
+            z-index: 5;
+        }
+        .writer-img { height: 80vh; opacity: 0.6; pointer-events: none; }
+
+        .bubble {
+            position: absolute; border-radius: 50%;
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; justify-content: center; align-items: center;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 20;
+        }
+
+        .bubble:hover { transform: scale(2.2) !important; border-color: var(--accent); z-index: 1000; }
+        .bubble img { width: 92%; height: 92%; border-radius: 50%; object-fit: cover; }
+
+        .caption {
+            position: absolute; bottom: -35px; width: 250%;
+            text-align: center; color: var(--accent);
+            font-family: 'Playfair Display', serif; font-style: italic;
+            font-size: 13px; opacity: 0; transition: 0.4s;
+            text-shadow: 0 2px 10px black;
+        }
+        .bubble:hover .caption { opacity: 1; transform: translateY(-5px); }
+
+        /* --- NEW BUTTON: OVAL JOURNEY --- */
+        .scroll-down-btn {
+            position: absolute; bottom: 30px; left: 50%;
+            transform: translateX(-50%);
+            width: 180px; height: 50px;
+            border: 1px solid var(--accent);
+            border-radius: 50px;
+            background: rgba(0, 229, 255, 0.05);
+            color: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; letter-spacing: 3px;
+            cursor: pointer; z-index: 2000;
+            transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
+        }
+
+        .scroll-down-btn:hover {
+            background: var(--accent);
+            color: black;
+            box-shadow: 0 0 30px var(--accent);
+            width: 200px;
+        }
+
+        /* --- SECTION 2: THE REALISTIC GOOGLE MAP ROADMAP --- */
+        #roadmap-section {
+            background: #111114;
+            display: flex; flex-direction: column;
+            align-items: center;
+            overflow-y: auto; /* Allow scrolling within the map journey */
+            cursor: crosshair;
+        }
+
+        .map-container {
+            position: relative;
+            width: 800px;
+            padding: 100px 0;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        /* The Road Line */
+        .map-road {
+            position: absolute;
+            width: 8px; height: 100%;
+            background: var(--map-road);
+            left: 50%; transform: translateX(-50%);
+            box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        .map-road::after {
+            content: '';
+            position: absolute;
+            width: 2px; height: 100%;
+            border-left: 2px dashed rgba(255,255,255,0.3);
+            left: 50%; transform: translateX(-50%);
+        }
+
+        /* Destination Points (Markers) */
+        .marker {
+            position: relative;
+            width: 40px; height: 40px;
+            background: #eb4034;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            margin: 150px 0;
+            cursor: pointer;
+            z-index: 10;
+            transition: 0.3s;
+            box-shadow: -2px 2px 10px rgba(0,0,0,0.5);
+        }
+
+        .marker::after {
+            content: '';
+            width: 14px; height: 14px;
+            background: white;
+            position: absolute; border-radius: 50%;
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+        }
+
+        .marker:hover {
+            transform: rotate(-45deg) scale(1.3);
+            background: var(--accent);
+        }
+
+        /* Marker Info Window (The Memory Pop-up) */
+        .marker-info {
+            position: absolute;
+            left: 60px; top: -50px;
+            transform: rotate(45deg); /* Counter-rotate marker tilt */
+            width: 280px; background: rgba(25, 25, 28, 0.95);
+            border: 1px solid var(--accent);
+            padding: 15px; border-radius: 12px;
+            display: none; flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .marker:hover .marker-info { display: flex; }
+
+        .marker-info img {
+            width: 100%; border-radius: 8px; margin-bottom: 10px;
+        }
+
+        .marker-info p {
+            font-size: 0.8rem; line-height: 1.4; color: #ccc; margin: 0;
+        }
+
+        .map-title {
+            position: sticky; top: 20px;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem; color: var(--accent);
+            z-index: 50; text-shadow: 0 0 20px black;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="custom-cursor"></div>
+
+    <section id="hero">
+        <div id="intro-curtain">
+            <button class="enter-btn" onclick="revealWorld()">UNFOLD OUR STORY</button>
+        </div>
+
+        <div class="header-story">
+            <span class="story-line">More than a sister, we are one soul.</span>
+            <span class="story-line-2">TWO BODIES, ONE RADIANT JOURNEY</span>
+        </div>
+
+        <div class="writer-container">
+            <img src="https://imgs.search.brave.com/eazzEk6aI-URlfXR7WPP96zn2-sffG1ToCmYN7_no_g/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9zdGF0/aWMudmVjdGVlenku/Y29tL3N5c3RlbS9y/ZXNvdXJjZXMvdGh1/bWJuYWlscy8wNjcv/MjE1Lzc3My9zbWFs/bC9zbWlsaW5nLXdv/bWFuLXdyaXRpbmct/aW4tbm90ZWJvb2st/YWdhaW5zdC10cmFu/c3BhcmVudC1iYWNr/Z3JvdW5kLWZyZWUt/cG5nLnBuZw" class="writer-img">
+        </div>
+
+        <a href="#roadmap-section" class="scroll-down-btn">
+            EXPLORE ROADMAP
+        </a>
+    </section>
+
+    <section id="roadmap-section">
+        <div class="map-title">The Roadmap of Us</div>
+
+        <div class="map-container" id="map-target">
+            <div class="map-road"></div>
+            </div>
+    </section>
+
+    <script>
+        const cursor = document.getElementById('custom-cursor');
+
+        // 1. Cursor Follow Effect
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // 2. Reveal Logic
+        function revealWorld() {
+            document.getElementById('intro-curtain').style.transform = 'translateY(-100%)';
+        }
+
+        // 3. Bouncing Bubble Engine (Section 1)
+        const memories = [
+            { img: '1.jpg', txt: "Inseparable by choice..." },
+            { img: '2.jpg', txt: "Woven together by fate." },
+            { img: '3.jpg', txt: "The sister my heart chose." },
+            { img: '4.jpg', txt: "One soul, shared between us." },
+            { img: '5.jpg', txt: "Every memory, a treasure." },
+            { img: '6.jpg', txt: "My partner in every dream." },
+            { img: '7.jpg', txt: "Echoes of our shared laughter." },
+            { img: '8.jpg', txt: "A bond beyond distance." },
+            { img: '9.jpg', txt: "Always you, forever us." },
+            { img: '10.jpg', txt: "The architect of our joy." }
+        ];
+
+        class Bubble {
+            constructor(data) {
+                this.size = Math.floor(Math.random() * 30) + 110;
+                this.el = document.createElement('div');
+                this.el.className = 'bubble';
+                this.el.style.width = this.el.style.height = this.size + 'px';
+                this.el.innerHTML = `<img src="${data.img}"><div class="caption">${data.txt}</div>`;
+                document.getElementById('hero').appendChild(this.el);
+
+                this.x = Math.random() * (window.innerWidth - this.size);
+                this.y = Math.random() * (window.innerHeight - this.size);
+                this.dx = (Math.random() - 0.5) * 2;
+                this.dy = (Math.random() - 0.5) * 2;
+
+                this.el.onmouseenter = () => this.isPaused = true;
+                this.el.onmouseleave = () => this.isPaused = false;
+            }
+
+            update() {
+                if (this.isPaused) return;
+                this.x += this.dx; this.y += this.dy;
+                if (this.x <= 0 || this.x + this.size >= window.innerWidth) this.dx *= -1;
+                if (this.y <= 0 || this.y + this.size >= window.innerHeight) this.dy *= -1;
+                this.el.style.left = this.x + 'px';
+                this.el.style.top = this.y + 'px';
+            }
+        }
+
+        const bubbleInstances = memories.map(m => new Bubble(m));
+        function animate() {
+            bubbleInstances.forEach(b => b.update());
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // 4. ROADMAP GENERATOR (Section 2)
+        const roadEvents = [
+            { img: '11.jpg', msg: "Where it all began... our first meeting." },
+            { img: '12.jpg', msg: "Late night secrets under the stars." },
+            { img: '13.jpg', msg: "Supporting each other through the storms." },
+            { img: '27.jpg', msg: "The day we realized we are one soul." },
+            { img: '28.jpg', msg: "Our favorite cafe and endless talks." },
+            { img: '29.jpg', msg: "First trip together—pure magic." },
+            { img: '30.jpg', msg: "A sisterhood that outshines time." },
+            { img: '14.jpg', msg: "Sharing dreams and conquerring fears." },
+            { img: '15.jpg', msg: "The architect of my happiness." },
+            { img: '16.jpg', msg: "Every milestone is better with you." },
+            { img: '17.jpg', msg: "No distance can ever break this bond." },
+            { img: '18.jpg', msg: "The day we laughed until we cried." },
+            { img: '19.jpg', msg: "You are my compass in this world." },
+            { img: '20.jpg', msg: "Building our future, step by step." },
+            { img: '21.jpg', msg: "More than friends—chosen family." },
+            { img: '22.jpg', msg: "A promise to be there, always." },
+            { img: '23.jpg', msg: "Your success feels like my own." },
+            { img: '24.jpg', msg: "A thousand memories, a million more to go." },
+            { img: '25.jpg', msg: "The one who knows my heart best." },
+            { img: '26.jpg', msg: "Happy Birthday to my eternal soulmate." }
+        ];
+
+        const mapContainer = document.getElementById('map-target');
+        roadEvents.forEach((event, index) => {
+            const marker = document.createElement('div');
+            marker.className = 'marker';
+            // Alternating side of the road
+            marker.style.left = (index % 2 === 0) ? '-150px' : '150px';
+
+            marker.innerHTML = `
+                <div class="marker-info">
+                    <img src="${event.img}">
+                    <p>${event.msg}</p>
+                </div>
+            `;
+            mapContainer.appendChild(marker);
+        });
+
+    </script>
+</body>
+</html>
